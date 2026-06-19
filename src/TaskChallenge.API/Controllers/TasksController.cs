@@ -1,15 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskChallenge.Application.Exceptions;
 using TaskChallenge.Application.UseCases.Tasks.Create;
+using TaskChallenge.Application.UseCases.Tasks.Delete;
 using TaskChallenge.Application.UseCases.Tasks.GetAll;
 using TaskChallenge.Application.UseCases.Tasks.GetById;
+using TaskChallenge.Application.UseCases.Tasks.Update;
 using TaskChallenge.Communication.Requests;
 using TaskChallenge.Communication.Responses;
 
 namespace TaskChallenge.API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/tasks")]
 public class TasksController : ControllerBase
 {
     [HttpPost]
@@ -62,6 +64,46 @@ public class TasksController : ControllerBase
             var response = new GetAllTasksUseCase().Execute();
             return Ok(response);
         }catch(ValidationException exception)
+        {
+            return BadRequest(new ResponseErrorsJson
+            {
+                Errors = [.. exception.Errors],
+            });
+        }
+    }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ResponseTaskJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
+    public IActionResult Update([FromRoute] Guid id, [FromBody] RequestTaskJson request)
+    {
+        try
+        {
+            var response = new UpdateTaskUseCase().Execute(id, request);
+            return Ok(response);
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(new ResponseErrorsJson
+            {
+                Errors = [.. exception.Errors],
+            });
+        }
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
+    public IActionResult Delete([FromRoute] Guid id)
+    {
+        try
+        {
+            new DeleteTaskUseCase().Execute(id);
+            return NoContent();
+        }
+        catch (ValidationException exception)
         {
             return BadRequest(new ResponseErrorsJson
             {
