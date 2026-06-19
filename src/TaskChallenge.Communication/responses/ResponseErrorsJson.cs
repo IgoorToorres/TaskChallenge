@@ -1,4 +1,4 @@
-namespace TaskChallenge.Comunication.Responses;
+namespace TaskChallenge.Communication.Responses;
 
 public class ResponseErrorsJson
 {

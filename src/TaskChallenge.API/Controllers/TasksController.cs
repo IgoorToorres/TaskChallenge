@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskChallenge.Application.Exceptions;
 using TaskChallenge.Application.UseCases.Tasks.Create;
 using TaskChallenge.Communication.Requests;
 using TaskChallenge.Communication.Responses;
-using TaskChallenge.Comunication.Responses;
 
 namespace TaskChallenge.API.Controllers;
 
@@ -15,7 +15,17 @@ public class TasksController : ControllerBase
     [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
     public IActionResult Create([FromBody] RequestTaskJson request)
     {
-        var response = new CreateTaskUseCase().Execute(request);
-        return Created(string.Empty, response);
+        try
+        {
+            var response = new CreateTaskUseCase().Execute(request);
+            return Created(string.Empty, response);
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(new ResponseErrorsJson
+            {
+                Errors = [.. exception.Errors],
+            });
+        }
     }
 }
