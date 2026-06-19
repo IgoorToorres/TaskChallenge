@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TaskChallenge.API/TaskChallenge.API.csproj" />
+  <Project Path="TaskChallenge.Application/TaskChallenge.Application.csproj" />
+  <Project Path="TaskChallenge.Communication/TaskChallenge.Communication.csproj" />
+</Solution>
